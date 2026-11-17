@@ -1,32 +1,30 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="./static/mywebscript.js"></script>
-    <style>
-        .center-heading {
-            text-align: center;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Emotion Detection</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f7fc; margin: 0; color: #182235; }
+    main { max-width: 700px; margin: 80px auto; padding: 36px; background: white;
+           border-radius: 16px; box-shadow: 0 12px 32px rgba(30,50,90,.1); }
+    h1 { margin-top: 0; }
+    label { display: block; margin-bottom: 10px; font-weight: bold; }
+    textarea { width: 100%; height: 110px; box-sizing: border-box; padding: 12px;
+               font: inherit; border: 1px solid #bbc7dc; border-radius: 8px; }
+    button { background: #2458bb; color: white; padding: 12px 24px; margin-top: 15px;
+             border: 0; border-radius: 8px; font: inherit; cursor: pointer; }
+    #result { margin-top: 22px; line-height: 1.7; white-space: pre-wrap; }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-body">
-            <h1 class="center-heading">NLP - Emotion Detection</h1> 
-            <div style="padding: 25px 25px 25px 25px;">
-            <h2 class="mb-3">
-                <label class="form-label">Please enter the text to be analyzed</label>
-                <input type="textarea" class="form-control" id="textToAnalyze">
-            </h2>
-
-            <div style="padding: 25px 25px 25px 25px;">
-                <button onclick="RunSentimentAnalysis()" class="btn btn-secondary">Run Sentiment Analysis</button>
-            </div>
-            <div style="padding: 25px 25px 25px 25px;"></div>
-            <h2 class="mb-3">
-                <label class="form-label">Result of Emotion Detection</label>
-            </h2>
-
-            <div id="system_response" style="padding: 25px 25px 25px 25px;"></div>
-        </div>
-    </div>
+  <main>
+    <h1>Emotion Detection</h1>
+    <label for="textToAnalyze">Enter text to analyze</label>
+    <textarea id="textToAnalyze" placeholder="I am very happy today!"></textarea>
+    <button type="button" id="analyzeButton">Analyze emotion</button>
+    <div id="result" role="status" aria-live="polite"></div>
+  </main>
+  <script src="{{ url_for('static', filename='mywebscript.js') }}"></script>
 </body>
+</html>
