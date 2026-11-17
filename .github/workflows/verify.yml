@@ -1,0 +1,56 @@
+name: Verify emotion detector
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run seven unit tests
+        run: python3 test_emotion_detection.py
+      - name: Run pylint
+        run: python3 -m pylint server.py
+      - name: Smoke test Flask pages
+        run: |
+          python3 - <<'PY'
+          from unittest.mock import patch
+          from server import app
+          with app.test_client() as client:
+              response = client.get("/")
+              assert response.status_code == 200, response.status_code
+              assert b"Emotion Detection" in response.data
+              with patch("server.emotion_detector", return_value={
+                  "anger": .91, "disgust": .02, "fear": .03,
+                  "joy": .01, "sadness": .03,
+                  "dominant_emotion": "anger"}):
+                  response = client.get("/emotionDetector?textToAnalyze=I%20am%20angry")
+                  assert response.status_code == 200
+                  assert b"dominant emotion is anger" in response.data
+              response = client.get("/emotionDetector?textToAnalyze=")
+              assert response.status_code == 200
+              assert b"Invalid text! Please try again!" in response.data
+              print("Flask page, mocked emotion result, and invalid input: OK")
+          PY
+      - name: Check live Watson NLP service
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          from EmotionDetection.emotion_detection import emotion_detector
+          try:
+              result = emotion_detector("I am really mad about this")
+              print("Watson NLP response:", result)
+              if result["dominant_emotion"] != "anger":
+                  raise AssertionError("Unexpected dominant emotion")
+          except Exception as exc:
+              print("LIVE WATSON CHECK UNVERIFIED:", repr(exc))
+              raise
+          PY
